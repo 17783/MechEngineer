@@ -50,23 +50,27 @@ namespace MechEngineer.Features.HardpointFix.sorting.Patches
             calculator = null;
         }
 
-        // ReSharper disable once RedundantAssignment
-        public static bool Prefix(HardpointDataDef hardpointDataDef, BaseComponentRef componentRef, string prefabBase, string location, ref List<string> usedPrefabNames, ref string __result)
+        public static bool Prefix(HardpointDataDef hardpointDataDef, BaseComponentRef componentRef, ref List<string> usedPrefabNames, ref string __result)
         {
             try
             {
-                if (componentRef is MechComponentRef mechComponentRef && mechComponentRef.ComponentDefType == ComponentType.Weapon)
+                if (calculator != null && componentRef is MechComponentRef mechComponentRef && mechComponentRef.ComponentDefType == ComponentType.Weapon)
                 {
-                    __result = calculator?.GetPrefabName(mechComponentRef);
+                    __result = calculator.GetPrefabName(mechComponentRef) ?? hardpointDataDef.HardpointData[0].weapons[0][0];
+                    usedPrefabNames.Add(__result);
+                    return false;
                 }
-
-                return __result == null;
             }
             catch (Exception e)
             {
                 Control.mod.Logger.LogError(e);
-                return true;
             }
+            return true;
         }
+
+        //public static void Postfix(BaseComponentRef componentRef, ref string __result)
+        //{
+        //    Control.mod.Logger.Log($"selected {__result} for {componentRef.ComponentDefID}");
+        //}
     }
 }
